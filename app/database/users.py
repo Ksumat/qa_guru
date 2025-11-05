@@ -4,6 +4,8 @@ from fastapi import HTTPException
 from sqlmodel import Session, select
 from app.database.engine import engine
 from app.models.User import User
+from fastapi_pagination import Page
+from fastapi_pagination.ext.sqlmodel import paginate
 
 
 def get_user(user_id: int) -> User | None:
@@ -15,6 +17,11 @@ def get_users() -> Iterable[User]:
     with Session(engine) as session:
         statement = select(User)
         return session.exec(statement).all()
+
+
+def get_users_paginated() -> Page[User]:
+    with Session(engine) as session:
+        return paginate(session, select(User))
 
 
 def create_user(user: User) -> User:
